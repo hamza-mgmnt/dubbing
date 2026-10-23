@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Multi-Speaker Video Dubbing Studio</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i data-lucide="mic" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-indigo-300">
+            AI Video Dubbing Studio
+          </h1>
+          <p class="text-xs text-slate-400">Multi-Speaker Diarization • Edge-TTS • Faster-Whisper</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+          100% Free & Local
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+
+    <!-- Upload & Configuration Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- Left Column: Video Dropzone & Preview -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+            <i data-lucide="video" class="w-4 h-4 text-indigo-400"></i>
+            1. Source Video
+          </h2>
+
+          <!-- Upload Dropzone -->
+          <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 rounded-xl p-8 text-center transition-all cursor-pointer bg-slate-950/40 group relative">
+            <input type="file" id="videoInput" accept="video/mp4,video/mkv,video/webm,video/quicktime" class="hidden">
+            <div id="dropzoneContent" class="space-y-3">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+                <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-slate-200">
+                  <span class="text-indigo-400 hover:underline">Click to upload</span> or drag and drop
+                </p>
+                <p class="text-xs text-slate-500 mt-1">MP4, MKV, MOV, or WebM (up to 500MB)</p>
+              </div>
+            </div>
+
+            <!-- Uploaded Video Preview Container -->
+            <div id="sourcePreviewContainer" class="hidden space-y-3">
+              <video id="sourceVideoPreview" controls class="w-full rounded-lg max-h-72 bg-black shadow-inner"></video>
+              <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                <span id="sourceFileName" class="truncate font-medium text-slate-300"></span>
+                <button type="button" id="removeVideoBtn" class="text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Change Video
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Settings & Controls -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm space-y-5">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+            <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
+            2. Dubbing Preferences
+          </h2>
+
+          <!-- Target Language -->
+          <div class="space-y-2">
+            <label for="targetLanguage" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+              Target Language
+            </label>
+            <div class="relative">
+              <select id="targetLanguage" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer">
+                <!-- Populated via API -->
+                <option value="hi">🇮🇳 Hindi (हिंदी)</option>
+                <option value="ur">🇵🇰 Urdu (اردو)</option>
+                <option value="en">🇺🇸 English (US)</option>
+                <option value="es">🇪🇸 Spanish (Español)</option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500">Each speaker will automatically receive a distinct neural voice.</p>
+          </div>
+
+          <!-- Audio Track Mode -->
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+              Audio Blending Mode
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="cursor-pointer border border-slate-700 bg-slate-950/60 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-500/10 rounded-xl p-3 text-xs transition-all flex flex-col justify-between">
+                <input type="radio" name="audioMode" value="replace" checked class="hidden">
+                <span class="font-semibold text-slate-200 mb-1">Mute Original</span>
+                <span class="text-[11px] text-slate-400 leading-tight">Full audio replacement with new voices.</span>
+              </label>
+
+              <label class="cursor-pointer border border-slate-700 bg-slate-950/60 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-500/10 rounded-xl p-3 text-xs transition-all flex flex-col justify-between">
+                <input type="radio" name="audioMode" value="duck" class="hidden">
+                <span class="font-semibold text-slate-200 mb-1">Voiceover Ducking</span>
+                <span class="text-[11px] text-slate-400 leading-tight">Ducks background original audio to 15%.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Advanced Collapsible Settings -->
+          <details class="group border border-slate-800 rounded-xl bg-slate-950/40 overflow-hidden text-xs">
+            <summary class="flex items-center justify-between px-4 py-3 cursor-pointer text-slate-300 hover:text-white font-medium select-none">
+              <span class="flex items-center gap-2">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-400"></i>
+                Advanced AI Models & Diarization
+              </span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 transition-transform group-open:rotate-90"></i>
+            </summary>
+            <div class="p-4 border-t border-slate-800 space-y-4">
+              <!-- Whisper Model -->
+              <div class="space-y-1.5">
+                <label for="whisperModel" class="block font-medium text-slate-300">Whisper Model Size</label>
+                <select id="whisperModel" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                  <option value="tiny">Tiny (Fastest, low accuracy)</option>
+                  <option value="base" selected>Base (Recommended for balance & speed)</option>
+                  <option value="small">Small (High accuracy, slightly slower)</option>
+                  <option value="medium">Medium (Best accuracy, requires good GPU/CPU)</option>
+                </select>
+              </div>
+
+              <!-- Pyannote Token -->
+              <div class="space-y-1.5">
+                <label for="hfToken" class="block font-medium text-slate-300">
+                  HuggingFace Token (Optional)
+                </label>
+                <input type="password" id="hfToken" placeholder="hf_..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-xs">
+                <p class="text-[11px] text-slate-500 leading-normal">
+                  Leave blank to use our built-in acoustic clustering fallback (zero setup!). Or provide a free HF token to use <code class="text-indigo-400">pyannote/speaker-diarization-3.1</code>.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <!-- Start Dubbing Button -->
+          <button id="startDubBtn" disabled class="w-full py-3.5 px-6 rounded-xl font-semibold text-sm bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            Start Multi-Speaker Dubbing
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Progress Section (Hidden by default) -->
+    <div id="progressSection" class="hidden bg-slate-900/60 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm space-y-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center animate-spin">
+            <i data-lucide="loader-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-slate-200">Dubbing Pipeline in Progress</h3>
+            <p id="currentStatusText" class="text-xs text-slate-400">Starting...</p>
+          </div>
+        </div>
+        <span id="progressPercentage" class="text-xl font-bold font-mono text-indigo-400">0%</span>
+      </div>
+
+      <!-- Animated Progress Bar -->
+      <div class="w-full bg-slate-950 rounded-full h-3 p-0.5 border border-slate-800 overflow-hidden">
+        <div id="progressBar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+      </div>
+
+      <!-- Live Terminal / Step Logs -->
+      <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 font-mono text-xs text-slate-300 space-y-1.5 max-h-48 overflow-y-auto" id="logConsole">
+        <div class="text-slate-500">[System] Initializing pipeline worker...</div>
+      </div>
+    </div>
+
+    <!-- Results Section (Hidden until complete) -->
+    <div id="resultSection" class="hidden space-y-8">
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+              Dubbed Video Ready
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Audio synchronized with distinct speaker voices</p>
+          </div>
+          <a id="downloadBtn" href="#" download class="px-5 py-2.5 rounded-xl font-semibold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            Download Dubbed Video
+          </a>
+        </div>
+
+        <!-- Video Player -->
+        <div class="max-w-3xl mx-auto rounded-xl overflow-hidden bg-black shadow-2xl border border-slate-800">
+          <video id="dubbedVideoPlayer" controls class="w-full max-h-[460px] aspect-video"></video>
+        </div>
+      </div>
+
+      <!-- Diarized Transcript & Translation Breakdown -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i data-lucide="users" class="w-4 h-4 text-indigo-400"></i>
+            Detected Speakers & Translated Dialogue
+          </h3>
+          <span id="speakerCountBadge" class="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-medium"></span>
+        </div>
+
+        <div id="transcriptContainer" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+          <!-- Dynamic segment cards will be inserted here -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+    <p>AI Video Dubbing Studio • Built with Faster-Whisper, Pyannote Diarization, Edge-TTS, and FFmpeg</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
