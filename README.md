@@ -36,7 +36,11 @@ ai-video-dubbing/
 
 Before running the server, ensure you have the following installed:
 
-### 1. Python 3.10+
+### 1. Python 3.11.9
+The repository pins Python to `3.11.9` in `.python-version` so Netlify installs
+dependencies with a version supported by the audio and machine-learning packages.
+Use the same version for local development.
+
 Check with:
 ```bash
 python --version
